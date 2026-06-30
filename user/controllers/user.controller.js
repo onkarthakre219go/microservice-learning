@@ -18,9 +18,12 @@ module.exports.register = async (req, res) => {
         await newUser.save();
 
         const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h'});
+      
+        delete user._doc.password; // why? delete password
+
         res.cookie('token', token);
 
-        res.send({ message: 'User registered successfully'});
+        res.send({ token, user });
     }catch(error){
         res.status(500).json({ message: error.message });
     }
@@ -44,7 +47,7 @@ module.exports.login = async (req, res) => {
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        delete user._doc.password; // why?
+        delete user._doc.password; // why? delete password
 
         res.cookie('token', token);
 
